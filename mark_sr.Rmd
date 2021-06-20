@@ -1,0 +1,406 @@
+---
+title: "Lapidando strings"
+author: "Pedro de Brito Neto"
+date: "01/05/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+um desafio muito grande na manipulação de dados é extrair informaçõs de caracteres. O objetivo é "lapidar" esse conjunto de caracteres para que seja posível usa-los nas análises.
+
+
+- Detectar: "Tem ou não tem?"
+- Localizar: "qual a posição deste elemento?"
+- Extrair: selecionar a parte que nos interessa.
+- Substituir: fazer mudanças e correções
+
+ Uma das principais soluções para isso é fazer é fazer o uso de funções e expressões regulares (Regular expressions). O proprio R possui algumas funções que nos ajudam a trabalhar com string's. Porém, o pacote `stringr` pertencente ao universo `tidyverse` deixa essas (e outras) funções de uma maneira muito mais intuitiva de ser utilizadas. Vamos primeiro mostrar algumas funções báscias do pacote que podem nos auxiliar nessa manipulação de caracteres e depois falaremos sobre as expressões regulares. Com um breve conhecimento em ambas as partes (funções e Regex), podemos junta-las e com isso tornar nossas análises muito mais fáceis.
+
+Para usar o pacote podemos importa-lo diretamente ou através do tidyverse.
+
+```{r, message = F, warning=FALSE}
+#carregando o stringr 
+library(stringr)
+library(tidyverse)
+
+``` 
+
+
+
+### str_length
+
+A primeira função que vamos falar é a `str_length`. Uma função bem simples do `stringr` que tem como objetivo fornecer o número de caracteres de uma string, ou seja, o comprimento da string (não confunda com o `length()` de um vetor). Uma observação é que para valores `NA` ela ira preservar esse valores ao invés de retornar "2". Vamos a um exemplo
+
+```{r}
+ex_1 <- c("tamanho", "das", "palavras", "com", "str_length", NA, "3")
+
+str_length(ex_1)
+
+```
+
+
+### str_sub
+
+É comum você precisar pegar partes fixas de strings, como apenas a parte final das strings ou apenas os 2 primeiros caracteres. Essa função possui 5 argumentos, você pode ver de uma forma mais clara utilizando o help do r (rodar `?str_sub` no console). Os três primeiros argumentos são em geral os mais utilizados. O primeiro irá receber um vetor de caracteres, o objeto a qual irá fazer as alterações. O segunda `start` você indica onde irá começar e o argumento `end` indica até onde ir. Para este exemplo em particular vamos criar uma vetor mais organizado para ficar mais claro.
+
+
+```{r}
+#vamos criar um vetor de caracteres padronizando "nome-idade"
+ex_sub <- c("João-42", "Maria-29", "Pedro-20", "Tereza-50")
+
+```
+
+Primeiro vamos supor que a gente queira pegar apenas os nomes. Como nesse caso os caracteres possuem tamanhos diferentes para os nomes, mas a idade possui dois digitos para todos. Uma característica interessante do `str_sub()` é sua capacidade de trabalhar com índices negativos nas posições starte end. Quando usamos uma posição negativa, str_sub()conta regressivamente a partir do último caractere:
+
+
+```{r}
+str_sub(ex_sub, end  = -4)
+```
+
+Caso a gente queira pegar apenas as idade podemos utilizar o argumento start para indicar onde iremos começar.
+
+```{r}
+str_sub(ex_sub, start = -2)
+#neste caso iremos pegar do penultimo caractere até o último
+```
+
+Também é possível utilizar o `start` e o `end` em conjunto. 
+
+```{r}
+ex_sub2 <- c("__SP__", "__MG__", "__RJ__", "__ES__")
+str_sub(ex_sub2, 3, 4)
+#estamos pegando valores da posição 3 até a posição 4.
+
+```
+
+
+### str_trim
+
+Dentro de um conjunto de dados é comum que a gente encontre textos com espaços a mais ou em lugares que não deveriam ter espaços. Espaços antes e após o texto são especialmente chatos, pois pode ser difícil detectá-los Isso pode acontecer principalmente quando estamos tratando de dados provenientes de formulários que contém respostas abertas, ou seja, cada usuário pode escrever da forma que preferir. Isso pode gerar alguns problemas, e um deles é serem criadas categorias diferentes para valores que deveriam ser iguais. A função `str_trim` pode nos auxiliar na resolução desse problema removendo os espaços excedentes antes e depois da string. Os argumentos da função são 2: a string, e `side`, onde você indica o lado que deseja tirar os espaçõs, `side = c("both", "left", "right"))`. 
+
+```{r}
+extrim <- c(" vetor", " para ", "exemplificar", "o uso", "  da função  ")
+
+str_trim(extrim, side = "left") #removendo espaçoes excedentes à esquerda
+str_trim(extrim, side = "right") #removendo espaçoes excedentes à direita
+str_trim(extrim, side = "both") #removendo espaçoes excedentes em ambos os lados
+
+```
+
+
+
+### str_detect e str_which
+```{r}
+#criando um vetor
+
+altura <- c("1.85", "1 metro e 60 centimetros", "191 cm", "167",
+             "1,58 metros", "188")
+
+```
+
+Caso a gente queira detectar alguma característica dentro desse vetor como números, letras ou palavras por exemplo, poderiamos fazer o uso do `str_detect`.
+
+```{r}
+#exemplo
+
+altura %>% str_detect("8"); #Aqui ele retorna um vetor boleano com valores "TRUE" caso o caractere contenha o "8" e "FALSO" caso contrario.
+
+#Também é possível utilizar operadores logicos 
+
+altura %>% str_detect("cm|centimetro")
+
+
+```
+ 
+Note que na segunda vez que utilizamos função, escrevemos "centimetro" e o vetor retornou um `TRUE` na posição dois, entretando ela esta no plural (centimetros). É exatamento isso que a função faz, ela não está buscando toda a palavra, ela busca padrões, qualquer caracter que tiver, nesse caso, "centimetro" ele irá retornar o valor `TRUE`. 
+Neste mesmo conceito, existe a função `str_which` que no lugar de retornar um vetor boleano, ela retona a possição da observação com a característica buscada
+
+```{r}
+altura %>% str_which("cm|centimetro")
+
+```
+
+### str_subset()
+
+Digamos agora que a gente queira não só detectar essas características, mas utiliza-las. A função `str_subset()` retorna essas strings compatíveis com a regex, sendo possível armazenar essas strings em um objeto. 
+
+```{r}
+
+altura %>% str_subset("cm|centimetro")
+ 
+``` 
+
+
+### str_remove e str_remove_all
+
+A função `str_remove` é usar para remover padrões das strings, por exemplo, você pode desejar tirar alguma letra, alguma numero ou algum caractere. Essa função (mas não só ela) possui umas variante que é `str_remove_all` que basicamente funciona da mesma maneira que a primeira, porém ela vai remover TODOS os padrões dentro da mesma string. Vamos demonstrar em um exemplo.
+
+```{r}
+
+altura %>% str_remove("8")
+
+ 
+altura %>% str_remove_all("8")
+```
+
+Observe que ao utilizar o `str_remove`, ainda ficou um "8" no último objeto. Isso acontece basicamente porque essa função remove o padrão escolhido de todas as strings, entretando apenas o primeiro encontrado. O `str_remove_all` é uma alternativa caso queira contornar isso.  
+
+### str_replace e str_repacle_all
+
+Agora digamos que a gente não queira remover certos padrões e sim, substituir por alguma outra coisa. A função `str_remove` nos axulia nisso e assim como a `str_remove`, ela também possui a variante `str_replace_all`. Essas funções possuem 3 argumentos. Em resumo, o primeiro argumento  `string` irá receber um vetor de caracteres. O segundo argumento `pattern` irá receber o padrão a ser procurado. Por fim, o terceiro argumento `replacement` recebe um vetor de caracteres de substituições e deve ter o comprimento um ou o mesmo comprimento que `string` ou `pattern` . Vamos a um exemplo simples.
+
+```{r}
+str_replace(altura, "cm|metros|centimetros", "cm." )
+
+str_replace_all(altura, c("cm" = "cm1", "centimetros" = "cm2", "metros" = ""))
+#note que no último argumento eu subsitui "metros" por nada.
+```
+
+
+
+# Expressões regulares
+
+Agora que já conhecemos algumas das funções do pacote stringr, vamos falar um pouco sobre as expressões regulares (regex). Para trabalhar com textos de uma maneira fácil, é necessário saber um pouco de regex.  Elas permitem identificar conjuntos de caracteres, palavras e outros padrões por meio de uma sintaxe concisa. O pacote divide algumas "características" das expressões regulares em subgrupos, como são muitos e normalmente seguem um padrão vamos falar apenas de algumas. Você pode ter acesso a toda parte de regex atráves do [cheat sheet](https://github.com/rstudio/cheatsheets/blob/master/strings.pdf). Para facilitar o entendimento, após introduzir uma base das expressões regulares, vamos seguir com os exemplos praticos, exemplicando passo a passo o que está acontecendo.
+
+# Classes
+
+#### Suplentes
+
+- `x|y` ou
+- `[xy]` qualquer um de  
+- `[^xy]`  qualquer coisa menos
+- `x-y` entre
+
+#### Âncoras 
+
+- `^x` começo da string
+- `x$` fim da string
+
+#### Olhar em volta
+
+- `x(?=y)` seguido por 
+- `x(?!y)` não seguido por 
+- `(?<=x)y` precedido por 
+- `(?<!x)y` não precedido por
+
+#### Quantificadores 
+
+- `x?` zero ou um
+- `x*` zero ou mais 
+- `x+` um ou mais 
+- `x{n}` exatamente "n"
+- `x{n,}` "n" ou mais 
+- `x{n,m}` entre "n" e "m"
+
+#### Alguns operadores interessantes
+
+- `\\s` espaço; `\\S` não espaço
+- `\\d` qualquer dígito; `\\D` não dígito
+- `\\w` qualquer caractere de palavra
+
+
+- `[:lower:]` letra minusculas
+- `[:upper:]` letras maiusculas 
+- `[:punct:]` pontuação 
+- `[:graph:]` letras, números e pontuações
+- `.` qualquer coisa (caso queira usar o "." em sua forma literal, use `\\.`)
+
+
+## Exemplificando classes e operadores 
+
+Mostramos acima algumas classes e operadores interesserantes e que geralmente são muito utilizados. Vamos agora mostrar em alguns exemplos como eles funcionam.
+
+ vamos criar então 2 vetores contendo as mesmas informações (3 modelos de carros), porém o segundo vetor terá espaços excedentes no meio das palavras. Imagino que poderiamos ter um conjunto de dados muito grande, "corrigir" um caractere por vez se tornaria improdutivo. Então, vamos pensar em uma solução para este exemplo usando regex.
+
+```{r}
+carros1 <- c("Ford Mustang", "Chevrolet Camaro", "Cherry Tigo")
+
+
+carros2 <- c("Ford      Mustang", "Chevrolet    Camaro", "Cherry      Tigo")
+
+identical(carros1, carros2)
+
+```
+
+Usamos a função `identical` para mostrar que o r reconhece que os vetores não são iguais. Para resolver esse problema, podemos usar a seguinte lógica: sabemos que o correto é haver apenas um espaço entre as palavras. Qualquer quantidade de espaços que for maior que um, iremos corrigir. Podemos fazer isso combinando regex com a função `str_replace_all`. 
+
+```{r}
+carros2 <- carros2 %>% 
+  str_replace_all("\\s{2,}", " ")
+
+identical(carros1, carros2)
+```
+
+Como já vimos, a função `str_replace_all` nos ajuda a fazer substiuições de caracteres. Nesse caso, a regex `\\s` signifca "espaço". O "{2,}", como já vimos, indica que queremos indificar algo se repita duas ou mais vezes. Então a função basicamente irá identificar toda vez que um espaço aparecer seguidamente duas ou mais vezes e vai substituir por apenas um espaço. Note que agora o identical retorna `true`, ou seja, os vetores são iguais. Lembrando que já falamos da `str_trim()` que remove espaços no começo e no fim dos caracteres, agora sabemos como tratar qualquer tipo de problema relacionado a espaços excedentes.
+
+
+Vamos agora voltar para um vetor que já utilizamos acima. Devido a maneira com que os caracteres estão armazenadas nesse vetor, fica complicado transformar esses caracteres em informações. Ao utilizarmos expressões de regulares de uma forma bem simples, já conseguimos trabalhar com essas informaçõs. 
+
+```{r}
+
+altura
+
+altura %>% 
+  str_remove_all("\\D")
+```
+
+observe que ao utilizar o `\\D`, obtivemos apenas números. Sendo assim já conseguimos uniformizar a maneira com que as informações estão sendo exibidar. A partir daqui já podemos até obter algumas estatísticas descritivas, como a média por exemplo.
+
+
+```{r}
+a <- c("não", "Não", "nao", "n", "NAO", "naaooo")
+
+
+a %>% str_sub("n|N[aãA]", "Não") 
+```
+
+
+## Na prática
+
+Vamos agora colocar em prática tudo o que vimos em um banco de dados fictício que iremos criar. 
+Supomos que uma empresa nacional de aluguel de veículos esteja interessada em obter algumas informações. Para isso ela irá aplicar um questionário tendo como público as pessoas que já alugaram seus veículos.
+No questionário as pessoas deveriam passar as seguintes informações: "Marca/modelo do veículo", "Alugaria de esse veículo novamente?", "grau de satisfação com a empresa", "Qual sua cidade/estado (sigla)". Todas as variáveis do questionario foram do tipo resposta aberta, ou seja, os respondentes poderiam escrevem de qualquer maneira suas respostas. Assim gerou-se uma dificuldade em sumarizar e obter informações relevantes desse banco de dados, já nas respostas foram encontradas erros como, espaços excedentes, palavras iguais escritas de formas diferentes, discordância entre letras maiúsculas e minúsculas, entre outros.  
+Torna-se necessário realizar um bom tratamento nesses caractéres para que seja possível extrair todas as informações. Vamos então utilizar o queridinho `stringr` para nos ajudar
+
+
+#### Criando o banco de dados
+
+Existem diferentes formas de criar um banco de dados. Para este exemplo vamos criar 4 vetores e transforma-los em um `data.frame`.
+
+
+
+```{r}
+# veículos da locadora: "Honda Civic", "Toyota Corolla", "Fiat Argo" e "Ford Fusion"
+veiculo <- c("Honda  civic", "honda - civic", "  fiat Argo", "FORD FUSION  ", "toyota Corolla", "Toyota   COROLLA", "Fiat  / argo", " HONDA civic", "ford fusion ", "toyota COROLLa")
+
+alugaria_de_novo <- c("SIM","Sim", "nao", "sim", "não", "NAOOO", "Não", "sim", "NÃO", "Nao")
+
+grau_de_satisfacao <- c("8.1", "10", "3,23", "6", " 5,3", "0,0000", "7.7", "9 ", "5", "6,666")
+
+cidade <- c("Vitória - ES", "sao paulo - sp", "serra - es ", "BELO HORIZONTE MG", " vitoria  Es", "Florianopolis / sc ", "TRES CORAÇÕES - mg", "salvador BA", "São Paulo - SP", " belo horizonte / mg")
+
+dados <- data.frame(veiculo,
+                    alugaria_de_novo,
+                    grau_de_satisfacao,
+                    cidade)
+```
+
+
+```{r}
+knitr::kable(head(dados, 10))
+```
+
+Assim ficou o nosso `data.frame`. Note que além dos erros visíveis, ainda temos problemas com espaços a mais antes, depois e no meio das palavras que apesar de não estar visível na apresentação da tabela, eles existem. 
+
+### Lapidando os caracteres
+
+Vamos fazer o nosso tratamento de dados variável por variável. Iremos mostrar maneiras diferentes de organizar essas informações, lembrando que isso pode ser feito de diversas formas.
+
+Olhando para a variável "veiculo" conseguimos notar um certo padrão. Todas as observações contém a marca do veículo seguida pelo modelo. A partir daqui já podemos pensar em algumas formas de tratamento, como, criar uma variável apenas com  a marca  e outra com o modelo. Note que a marca e modelo são separados ou por espaço, ou por um "-" ou por "/". Perceber padrões no seu banco de dados é interessante para o tratamento.
+
+```{r}
+dados <- dados %>% 
+  mutate(marca = veiculo %>%  
+           str_trim() %>%
+           str_remove("\\s.+|\\s\\(.+|/.+") %>% 
+           str_to_upper(),
+         modelo = veiculo %>% 
+           str_trim() %>%
+           str_extract("\\s.+|\\s\\(.+|/.+") %>% 
+           str_remove("[:punct:]") %>% 
+           str_trim() %>% 
+           str_to_upper, 
+         marca_modelo = paste(marca, modelo))
+
+```
+
+
+Acabamos de criar 3 novas variáveis a partir da variável original (`veiculos`). Básicamente utilizamos as funções já mostradas ateriormente como a `str_trim` para remover os espaçoes antes e depois do characteres, também utilizamos o `str_remove` e `str_extrac`, ambos combinados com as mesmas expressões regulares (`\\s.+|\\s\\(.+|/.+`). Em resumo essa regex detecta todo "espaço" seguido por qualquer coisa ou "espaço" seguido por um parenteses aberto seguido por qualquer coisa ou uma "/" seguida por qualquer coisa. Também utilizamos o `str_remove("[:punct:]")` e `str_to_upper` para deixar todas as letras sem acentos, maiúsculas e padronizadas.
+
+
+A variável `alugaria_de_novo` é do tipo binária que contém, ou pelo menos deveria, dois tipo de respostas: "SIM" e "NÃO". De fato todas as respostas estão representando ou um SIM ou um NAO, entretando, devido as diferentes maneiras com que elas foram escritas, fica difícil extrair informações. Vamos então tratar essa variável.
+
+
+```{r}
+
+
+dados$alugaria_de_novo <- dados$alugaria_de_novo %>% 
+  str_replace("^S|s[Ii]", "SIM") %>% 
+  str_sub(end = 3)
+
+
+dados$alugaria_de_novo <- dados$alugaria_de_novo %>% 
+  str_replace("^N|n[Aaãâ]", "NAO") %>% 
+  str_sub(end = 3)
+
+dados$alugaria_de_novo
+```
+
+Para este caso usamos o `str_replace` junto com expressões regulares para substituir palvras que representam  "sim" e "não" por"SIM" e o "NAO", respectivamente. Após isso, usamos o str sub para pegar apenas as três primeiras letras. Vale ressaltar que caso outras palavras apareçam na resposta, ela não vai funcionar, nesse caso será preciso utilizar outras funções ou apenas "aprimorar" as expressões regulares utilizadas.
+
+
+
+Para o grau de satisfação as pessoas deram notas de 0 a 10, notamos que algumas pessoas separaram os números utilizando "." e outras utilizando ",". O r entende essa variável como character e pode ser interessante trasnformar essa variável um númerica para realizar algumas análises quantitativas, entretando, temos alguns problemas. O r não irá reconhecer como número uma varavel com duas formas diferentes de separação ("." e ",") é necessário padronizar essa variável.
+
+
+```{r}
+dados$grau_de_satisfacao <-  
+  str_replace(grau_de_satisfacao, "\\,", "\\.") %>% 
+  str_trim() 
+
+dados$grau_de_satisfacao <- as.numeric(dados$grau_de_satisfacao) 
+dados$grau_de_satisfacao <- round(dados$grau_de_satisfacao, 1)
+
+dados$grau_de_satisfacao
+```
+
+
+Substituimos todas as virgulas por pontos por meio da função `str_replace`, depois foi necessário transformar a variável em númerica, fizemos isso por meio da função `as.numeric`. Logo após, utilizamos a função `round` para arredondar os números para uma casa decimal. A parte de arredondar números pode ser interessante em diversar análises, o r possui algumas funções além da `round` como  `floor` e `ceiling`. Pode ser interessente pesquisar sobre elas. 
+
+
+
+A última variável para ser tratada é a que contém as informações de cidade/estado dos respondentes. Observe que as observações tem estruturas parecisar com as da variável `veiculos`, um tratamento parecido poderia ser útil, mas vamos fazer um pouco diferente.
+
+
+
+```{r}
+dados$cidade <- dados$cidade %>% 
+  str_trim() %>% 
+  str_to_upper() %>% 
+  str_remove_all("[:punct:]") %>% 
+  abjutils::rm_accent() %>% 
+  str_replace("\\s{2}" , " - ")
+
+dados$cidade
+```
+
+
+Aqui queremos padronizar as observações para que fiquem no padrão "CIDADE - UF" então começamos removendo espaçoes excedentes, depois deixamos todas as letras maiúsculas e então usamos o `str_remove_all("[:punct:]")`, mesmo assim ainda restou restou alguns acentos como em `VÍTORIA`. Para corrigir isso utilizamos a função `rm_accent` do pacote `abjutils`. O último passo seria substituir os espaços que separam a cidade do UF por um "-". Uma maneira de fazer isso seria utilizando o `str_replace`, entretanto algumas cidade possuem mais de um nome, ou seja, ao fazer essa substituição todos os espaços seriam afetados e teriamos resultados como "SAO - PAULO - SP". Uma maneira de contornar isso (nesse caso) é usar as expressões regulares `"\\s{2}"` que indica "todo espaço seguido por exatamente 2 letras" já que, caso uma cidade tenha mais de um nome, esse segundo nome certamente terá mais de 2 letras e além disso, todos os UF's tem exatamente duas letras.
+
+
+Para finalizar vamos comparar o banco de dados tratado com o original. Uma última coisa a ser feita é reordenar as varíaveis e remover  a variável `veiculo`, já que geramos outras a partir dela deixando-a inutilizavel. 
+
+```{r}
+dados <- dados %>% 
+  subset(select = -c(veiculo)) %>% 
+  select(marca_modelo, marca, modelo, everything())
+
+knitr::kable(head(dados, 10))
+
+```
+
+
+Com o banco de dados prontos já é possível realizar inumeras análises e conseguir apresentar os resultados/informações. Muitas dessas informações são passadas atráves de gráficos. O pacote `ggplot2` é um grande aliado nesse ramo, mas isso é assunto para um outros post (spoiler).
+
+Esperamos que com esse post você possa entender um pouco mais de como tratar strings utilizando (mas não só) o pacote `stringr` e expressões regulares. Vale ressaltar que realizar um tratamento de caracteres, inumeros obstaculos podem surgir no caminho. É importante ter em mente que cada caso é um caso e muitas das vezes você precisará encontrar uma expressão regular que resolva aquele seu problema específico. 
+
+
+
+# Referências 
+
+<https://livro.curso-r.com/7-4-o-pacote-stringr.html>
+
+<https://bookdown.org/davi_moreira/txt4cs/stringR.html>
+
+<https://www.youtube.com/watch?v=ii4Pfox-3s8&t=3274s>
