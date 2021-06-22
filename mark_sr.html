@@ -172,21 +172,21 @@ pre code {
 </div>
 
 
-<p>um desafio muito grande na manipulação de dados é extrair informaçõs de caracteres. O objetivo é “lapidar” esse conjunto de caracteres para que seja posível usa-los nas análises.</p>
+<p>um desafio muito grande na manipulação de dados é extrair informaçõs de caracteres. Em resumo caracteres são letras, símbolos, sinais, números que representem algo escrito, etc.. Essa sequência de caracteres formam o que chamamos de <code>string</code> e chamamos de texto variáveis compostas por string’s. Diversas vezes encontramos variáveis com categorias não padronizadas, como, por exemplo, uma variável contendo “São Paulo”, “sao paulo” e “sp”. Apesar de representarem o mesmo estado, elas são diferentes Uma parte muito importante no tratamento de dados é “lapidar” esse conjunto de caracteres para que seja posível usá-los nas análises.</p>
 <ul>
 <li>Detectar: “Tem ou não tem?”</li>
 <li>Localizar: “qual a posição deste elemento?”</li>
 <li>Extrair: selecionar a parte que nos interessa.</li>
 <li>Substituir: fazer mudanças e correções</li>
 </ul>
-<p>Uma das principais soluções para isso é fazer é fazer o uso de funções e expressões regulares (Regular expressions). O proprio R possui algumas funções que nos ajudam a trabalhar com string’s. Porém, o pacote <code>stringr</code> pertencente ao universo <code>tidyverse</code> deixa essas (e outras) funções de uma maneira muito mais intuitiva de ser utilizadas. Vamos primeiro mostrar algumas funções báscias do pacote que podem nos auxiliar nessa manipulação de caracteres e depois falaremos sobre as expressões regulares. Com um breve conhecimento em ambas as partes (funções e Regex), podemos junta-las e com isso tornar nossas análises muito mais fáceis.</p>
-<p>Para usar o pacote podemos importa-lo diretamente ou através do tidyverse.</p>
+<p>Uma das principais soluções para isso é fazer o uso de funções e expressões regulares <strong>Regular expressions</strong>. O proprio R possui algumas funções que nos ajudam a trabalhar com string’s. Porém, o pacote <code>stringr</code> pertencente ao universo <code>tidyverse</code> deixa essas (e outras) funções de uma maneira muito mais intuitiva de ser utilizadas. Vamos primeiro mostrar algumas funções basicas do pacote que podem nos auxiliar nessa manipulação de caracteres e depois falaremos sobre as expressões regulares. Com um breve conhecimento em ambas as partes (funções e Regex), podemos juntá-las e com isso tornar nossas análises muito mais fáceis.</p>
+<p>Para usar o pacote podemos importa-lo diretamente ou através do tidyverse. Para o post vamos carregar o tidyverse pois iremos utilizar algumas funções de outros pacotes. Vale lembrar que já fizemos um post sobre o <code>tidyverse</code> e pode acessá-lo clickando <a href="https://daslab-ufes.github.io/tidyverse/">aqui</a>.</p>
+<p>que em resumo são letras, símbolos, sinais, número que representa algo escrito, etc.. Esses</p>
 <pre class="r"><code>#carregando o stringr 
-library(stringr)
 library(tidyverse)</code></pre>
 <div id="str_length" class="section level3">
 <h3>str_length</h3>
-<p>A primeira função que vamos falar é a <code>str_length</code>. Uma função bem simples do <code>stringr</code> que tem como objetivo fornecer o número de caracteres de uma string, ou seja, o comprimento da string (não confunda com o <code>length()</code> de um vetor). Uma observação é que para valores <code>NA</code> ela ira preservar esse valores ao invés de retornar “2”. Vamos a um exemplo</p>
+<p>A primeira função que vamos falar é a <code>str_length</code>. Uma função bem simples do <code>stringr</code> que tem como objetivo fornecer o número de caracteres de uma string, ou seja, o comprimento da string (não confunda com o <code>length()</code> de um vetor). Uma observação é que para valores <code>NA</code> ela irá preservar esse valores ao invés de retornar “2”. Vamos a um exemplo</p>
 <pre class="r"><code>ex_1 &lt;- c(&quot;tamanho&quot;, &quot;das&quot;, &quot;palavras&quot;, &quot;com&quot;, &quot;str_length&quot;, NA, &quot;3&quot;)
 
 str_length(ex_1)</code></pre>
@@ -194,10 +194,10 @@ str_length(ex_1)</code></pre>
 </div>
 <div id="str_sub" class="section level3">
 <h3>str_sub</h3>
-<p>É comum você precisar pegar partes fixas de strings, como apenas a parte final das strings ou apenas os 2 primeiros caracteres. Essa função possui 5 argumentos, você pode ver de uma forma mais clara utilizando o help do r (rodar <code>?str_sub</code> no console). Os três primeiros argumentos são em geral os mais utilizados. O primeiro irá receber um vetor de caracteres, o objeto a qual irá fazer as alterações. O segunda <code>start</code> você indica onde irá começar e o argumento <code>end</code> indica até onde ir. Para este exemplo em particular vamos criar uma vetor mais organizado para ficar mais claro.</p>
+<p>É comum você precisar pegar partes fixas de strings, como apenas a parte final das strings ou apenas os 2 primeiros caracteres. Essa função possui 5 argumentos, você pode ver de uma forma mais clara utilizando o help do R (rodar <code>?str_sub</code> no console). Os três primeiros argumentos são em geral os mais utilizados. O primeiro irá receber um vetor de caracteres, o objeto a qual irá fazer as alterações. O segundo <code>start</code> você indica onde irá começar e o argumento <code>end</code> indica até onde ir. Para este exemplo em particular vamos criar uma vetor mais organizado para ficar mais claro.</p>
 <pre class="r"><code>#vamos criar um vetor de caracteres padronizando &quot;nome-idade&quot;
 ex_sub &lt;- c(&quot;João-42&quot;, &quot;Maria-29&quot;, &quot;Pedro-20&quot;, &quot;Tereza-50&quot;)</code></pre>
-<p>Primeiro vamos supor que a gente queira pegar apenas os nomes. Como nesse caso os caracteres possuem tamanhos diferentes para os nomes, mas a idade possui dois digitos para todos. Uma característica interessante do <code>str_sub()</code> é sua capacidade de trabalhar com índices negativos nas posições starte end. Quando usamos uma posição negativa, str_sub()conta regressivamente a partir do último caractere:</p>
+<p>Primeiro vamos supor que a gente queira pegar apenas os nomes. Como nesse caso os caracteres possuem tamanhos diferentes para os nomes, mas a idade possui dois digitos para todos. Uma característica interessante do <code>str_sub()</code> é sua capacidade de trabalhar com índices negativos nas posições start e end. Quando usamos uma posição negativa, str_sub() conta regressivamente a partir do último caractere:</p>
 <pre class="r"><code>str_sub(ex_sub, end  = -4)</code></pre>
 <pre><code>## [1] &quot;João&quot;   &quot;Maria&quot;  &quot;Pedro&quot;  &quot;Tereza&quot;</code></pre>
 <p>Caso a gente queira pegar apenas as idade podemos utilizar o argumento start para indicar onde iremos começar.</p>
@@ -212,7 +212,7 @@ str_sub(ex_sub2, 3, 4)</code></pre>
 </div>
 <div id="str_trim" class="section level3">
 <h3>str_trim</h3>
-<p>Dentro de um conjunto de dados é comum que a gente encontre textos com espaços a mais ou em lugares que não deveriam ter espaços. Espaços antes e após o texto são especialmente chatos, pois pode ser difícil detectá-los Isso pode acontecer principalmente quando estamos tratando de dados provenientes de formulários que contém respostas abertas, ou seja, cada usuário pode escrever da forma que preferir. Isso pode gerar alguns problemas, e um deles é serem criadas categorias diferentes para valores que deveriam ser iguais. A função <code>str_trim</code> pode nos auxiliar na resolução desse problema removendo os espaços excedentes antes e depois da string. Os argumentos da função são 2: a string, e <code>side</code>, onde você indica o lado que deseja tirar os espaçõs, <code>side = c(&quot;both&quot;, &quot;left&quot;, &quot;right&quot;))</code>.</p>
+<p>Dentro de um conjunto de dados é comum que a gente encontre textos com espaços a mais ou em lugares que não deveriam ter espaços. Espaços antes e após o texto são especialmente chatos, pois pode ser difícil detectá-los. Isso pode acontecer principalmente quando estamos tratando de dados provenientes de formulários que contém respostas abertas, ou seja, cada usuário pode escrever da forma que preferir. Isso pode gerar alguns problemas, como criar categorias diferentes para valores que deveriam ser iguais. A função <code>str_trim</code> pode nos auxiliar na resolução desse problema removendo os espaços excedentes antes e depois da string. Os argumentos da função são 2: o objeto , e <code>side</code>, onde você indica o lado que deseja tirar os espaçõs, <code>side = c(&quot;both&quot;, &quot;left&quot;, &quot;right&quot;))</code>.</p>
 <pre class="r"><code>extrim &lt;- c(&quot; vetor&quot;, &quot; para &quot;, &quot;exemplificar&quot;, &quot;o uso&quot;, &quot;  da função  &quot;)
 
 str_trim(extrim, side = &quot;left&quot;) #removendo espaçoes excedentes à esquerda</code></pre>
@@ -224,32 +224,33 @@ str_trim(extrim, side = &quot;left&quot;) #removendo espaçoes excedentes à esq
 </div>
 <div id="str_detect-e-str_which" class="section level3">
 <h3>str_detect e str_which</h3>
+<p>Caso a gente queira detectar alguma característica dentro de um vetor como números, letras ou palavras por exemplo, poderiamos fazer o uso do <code>str_detect</code>.</p>
 <pre class="r"><code>#criando um vetor
 
 altura &lt;- c(&quot;1.85&quot;, &quot;1 metro e 60 centimetros&quot;, &quot;191 cm&quot;, &quot;167&quot;,
              &quot;1,58 metros&quot;, &quot;188&quot;)</code></pre>
-<p>Caso a gente queira detectar alguma característica dentro desse vetor como números, letras ou palavras por exemplo, poderiamos fazer o uso do <code>str_detect</code>.</p>
+<p>Como dito antes, iremos utilizar algumas outras funções e uma delas é o operador pipe (<code>%&gt;%</code>). No post sobre <code>tidyverse</code> ensinamos a usar esse operador.</p>
 <pre class="r"><code>#exemplo
 
 altura %&gt;% str_detect(&quot;8&quot;); #Aqui ele retorna um vetor boleano com valores &quot;TRUE&quot; caso o caractere contenha o &quot;8&quot; e &quot;FALSO&quot; caso contrario.</code></pre>
 <pre><code>## [1]  TRUE FALSE FALSE FALSE  TRUE  TRUE</code></pre>
-<pre class="r"><code>#Também é possível utilizar operadores logicos 
+<pre class="r"><code>#Também é possível utilizar operadores lógicos 
 
 altura %&gt;% str_detect(&quot;cm|centimetro&quot;)</code></pre>
 <pre><code>## [1] FALSE  TRUE  TRUE FALSE FALSE FALSE</code></pre>
-<p>Note que na segunda vez que utilizamos função, escrevemos “centimetro” e o vetor retornou um <code>TRUE</code> na posição dois, entretando ela esta no plural (centimetros). É exatamento isso que a função faz, ela não está buscando toda a palavra, ela busca padrões, qualquer caracter que tiver, nesse caso, “centimetro” ele irá retornar o valor <code>TRUE</code>. Neste mesmo conceito, existe a função <code>str_which</code> que no lugar de retornar um vetor boleano, ela retona a possição da observação com a característica buscada</p>
+<p>Note que na segunda vez que utilizamos função, escrevemos “centimetro” e o vetor retornou um <code>TRUE</code> na posição dois, entretando ela está no plural (centimetros). É exatamento isso que a função faz, ela não está buscando toda a palavra, ela busca padrões, qualquer caracter que tiver, nesse caso, “centimetro” ele irá retornar o valor <code>TRUE</code>. Neste mesmo conceito, existe a função <code>str_which</code> que no lugar de retornar um vetor boleano, ela retona a possição da observação no vetor com a característica buscada</p>
 <pre class="r"><code>altura %&gt;% str_which(&quot;cm|centimetro&quot;)</code></pre>
 <pre><code>## [1] 2 3</code></pre>
 </div>
 <div id="str_subset" class="section level3">
 <h3>str_subset()</h3>
-<p>Digamos agora que a gente queira não só detectar essas características, mas utiliza-las. A função <code>str_subset()</code> retorna essas strings compatíveis com a regex, sendo possível armazenar essas strings em um objeto.</p>
+<p>Digamos agora que a gente queira não só detectar essas características (números, pontuação, letras), mas utilizá-las. A função <code>str_subset()</code> retorna essas strings compatíveis com a características fornecida, sendo possível armazenar essas strings em um objeto.</p>
 <pre class="r"><code>altura %&gt;% str_subset(&quot;cm|centimetro&quot;)</code></pre>
 <pre><code>## [1] &quot;1 metro e 60 centimetros&quot; &quot;191 cm&quot;</code></pre>
 </div>
 <div id="str_remove-e-str_remove_all" class="section level3">
 <h3>str_remove e str_remove_all</h3>
-<p>A função <code>str_remove</code> é usar para remover padrões das strings, por exemplo, você pode desejar tirar alguma letra, alguma numero ou algum caractere. Essa função (mas não só ela) possui umas variante que é <code>str_remove_all</code> que basicamente funciona da mesma maneira que a primeira, porém ela vai remover TODOS os padrões dentro da mesma string. Vamos demonstrar em um exemplo.</p>
+<p>A função <code>str_remove</code> é usada para remover padrões das strings, por exemplo, você pode desejar tirar alguma letra, algum número ou algum caractere. Essa função (mas não só ela) possui umas variante que é <code>str_remove_all</code> que basicamente funciona da mesma maneira que a primeira, porém ela vai remover TODOS os padrões dentro da mesma string. Vamos demonstrar em um exemplo.</p>
 <pre class="r"><code>altura %&gt;% str_remove(&quot;8&quot;)</code></pre>
 <pre><code>## [1] &quot;1.5&quot;                      &quot;1 metro e 60 centimetros&quot;
 ## [3] &quot;191 cm&quot;                   &quot;167&quot;                     
@@ -262,7 +263,7 @@ altura %&gt;% str_detect(&quot;cm|centimetro&quot;)</code></pre>
 </div>
 <div id="str_replace-e-str_repacle_all" class="section level3">
 <h3>str_replace e str_repacle_all</h3>
-<p>Agora digamos que a gente não queira remover certos padrões e sim, substituir por alguma outra coisa. A função <code>str_remove</code> nos axulia nisso e assim como a <code>str_remove</code>, ela também possui a variante <code>str_replace_all</code>. Essas funções possuem 3 argumentos. Em resumo, o primeiro argumento <code>string</code> irá receber um vetor de caracteres. O segundo argumento <code>pattern</code> irá receber o padrão a ser procurado. Por fim, o terceiro argumento <code>replacement</code> recebe um vetor de caracteres de substituições e deve ter o comprimento um ou o mesmo comprimento que <code>string</code> ou <code>pattern</code> . Vamos a um exemplo simples.</p>
+<p>Agora digamos que a gente não queira remover certos padrões e sim substituir por alguma outra coisa. A função <code>str_remove</code> nos auxilia nisso e assim como a <code>str_remove</code>, ela também possui a variante <code>str_replace_all</code>. Essas funções possuem 3 argumentos. Em resumo, o primeiro argumento <code>string</code> irá receber um vetor de caracteres. O segundo argumento <code>pattern</code> irá receber o padrão a ser procurado. Por fim, o terceiro argumento <code>replacement</code> recebe um vetor de caracteres de substituições e deve ter o comprimento um ou o mesmo comprimento que <code>string</code> ou <code>pattern</code> . Vamos a um exemplo simples.</p>
 <pre class="r"><code>str_replace(altura, &quot;cm|metros|centimetros&quot;, &quot;cm.&quot; )</code></pre>
 <pre><code>## [1] &quot;1.85&quot;             &quot;1 metro e 60 cm.&quot; &quot;191 cm.&quot;          &quot;167&quot;             
 ## [5] &quot;1,58 cm.&quot;         &quot;188&quot;</code></pre>
@@ -330,7 +331,7 @@ altura %&gt;% str_detect(&quot;cm|centimetro&quot;)</code></pre>
 <div id="exemplificando-classes-e-operadores" class="section level2">
 <h2>Exemplificando classes e operadores</h2>
 <p>Mostramos acima algumas classes e operadores interesserantes e que geralmente são muito utilizados. Vamos agora mostrar em alguns exemplos como eles funcionam.</p>
-<p>vamos criar então 2 vetores contendo as mesmas informações (3 modelos de carros), porém o segundo vetor terá espaços excedentes no meio das palavras. Imagino que poderiamos ter um conjunto de dados muito grande, “corrigir” um caractere por vez se tornaria improdutivo. Então, vamos pensar em uma solução para este exemplo usando regex.</p>
+<p>vamos criar então 2 vetores contendo as mesmas informações (3 modelos de carros), porém o segundo vetor terá espaços excedentes no meio das palavras. Imagino que poderíamos ter um conjunto de dados muito grande, “corrigir” um caractere por vez se tornaria improdutivo. Então, vamos pensar em uma solução para este exemplo usando regex.</p>
 <pre class="r"><code>carros1 &lt;- c(&quot;Ford Mustang&quot;, &quot;Chevrolet Camaro&quot;, &quot;Cherry Tigo&quot;)
 
 
@@ -338,40 +339,38 @@ carros2 &lt;- c(&quot;Ford      Mustang&quot;, &quot;Chevrolet    Camaro&quot;, 
 
 identical(carros1, carros2)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<p>Usamos a função <code>identical</code> para mostrar que o r reconhece que os vetores não são iguais. Para resolver esse problema, podemos usar a seguinte lógica: sabemos que o correto é haver apenas um espaço entre as palavras. Qualquer quantidade de espaços que for maior que um, iremos corrigir. Podemos fazer isso combinando regex com a função <code>str_replace_all</code>.</p>
+<p>Usamos a função <code>identical</code> para mostrar que o R reconhece que os vetores não são iguais. Para resolver esse problema, podemos usar a seguinte lógica: sabemos que o correto é haver apenas um espaço entre as palavras. Qualquer quantidade de espaços que for maior que um, iremos corrigir. Podemos fazer isso combinando regex com a função <code>str_replace_all</code>.</p>
 <pre class="r"><code>carros2 &lt;- carros2 %&gt;% 
   str_replace_all(&quot;\\s{2,}&quot;, &quot; &quot;)
 
-identical(carros1, carros2)</code></pre>
+carros2</code></pre>
+<pre><code>## [1] &quot;Ford Mustang&quot;     &quot;Chevrolet Camaro&quot; &quot;Cherry Tigo&quot;</code></pre>
+<pre class="r"><code>identical(carros1, carros2)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
-<p>Como já vimos, a função <code>str_replace_all</code> nos ajuda a fazer substiuições de caracteres. Nesse caso, a regex <code>\\s</code> signifca “espaço”. O “{2,}”, como já vimos, indica que queremos indificar algo se repita duas ou mais vezes. Então a função basicamente irá identificar toda vez que um espaço aparecer seguidamente duas ou mais vezes e vai substituir por apenas um espaço. Note que agora o identical retorna <code>true</code>, ou seja, os vetores são iguais. Lembrando que já falamos da <code>str_trim()</code> que remove espaços no começo e no fim dos caracteres, agora sabemos como tratar qualquer tipo de problema relacionado a espaços excedentes.</p>
+<p>Como já vimos, a função <code>str_replace_all</code> nos ajuda a fazer substiuições de caracteres. Nesse caso, a regex <code>\\s</code> signifca “espaço”. O “{2,}”, como já vimos, indica que queremos identificar algo se repita duas ou mais vezes. Então a função basicamente irá identificar toda vez que um espaço aparecer seguidamente duas ou mais vezes e vai substituir por apenas um espaço. Note que agora o identical retorna <code>true</code>, ou seja, os vetores são iguais. Lembrando que já falamos da <code>str_trim()</code> que remove espaços no começo e no fim dos caracteres, agora sabemos como tratar qualquer tipo de problema relacionado a espaços excedentes.</p>
 <p>Vamos agora voltar para um vetor que já utilizamos acima. Devido a maneira com que os caracteres estão armazenadas nesse vetor, fica complicado transformar esses caracteres em informações. Ao utilizarmos expressões de regulares de uma forma bem simples, já conseguimos trabalhar com essas informaçõs.</p>
 <pre class="r"><code>altura</code></pre>
 <pre><code>## [1] &quot;1.85&quot;                     &quot;1 metro e 60 centimetros&quot;
 ## [3] &quot;191 cm&quot;                   &quot;167&quot;                     
 ## [5] &quot;1,58 metros&quot;              &quot;188&quot;</code></pre>
-<pre class="r"><code>altura %&gt;% 
-  str_remove_all(&quot;\\D&quot;)</code></pre>
+<pre class="r"><code>altura &lt;- altura %&gt;% 
+  str_remove_all(&quot;\\D&quot;)
+
+altura</code></pre>
 <pre><code>## [1] &quot;185&quot; &quot;160&quot; &quot;191&quot; &quot;167&quot; &quot;158&quot; &quot;188&quot;</code></pre>
-<p>observe que ao utilizar o <code>\\D</code>, obtivemos apenas números. Sendo assim já conseguimos uniformizar a maneira com que as informações estão sendo exibidar. A partir daqui já podemos até obter algumas estatísticas descritivas, como a média por exemplo.</p>
-<pre class="r"><code>a &lt;- c(&quot;não&quot;, &quot;Não&quot;, &quot;nao&quot;, &quot;n&quot;, &quot;NAO&quot;, &quot;naaooo&quot;)
-
-
-a %&gt;% str_sub(&quot;n|N[aãA]&quot;, &quot;Não&quot;) </code></pre>
-<pre><code>## Warning in stri_sub(string, from = start, to = end): NAs introduzidos por
-## coerção
-
-## Warning in stri_sub(string, from = start, to = end): NAs introduzidos por
-## coerção</code></pre>
-<pre><code>## [1] NA NA NA NA NA NA</code></pre>
+<p>observe que ao utilizar o <code>\\D</code>, obtivemos apenas números. Sendo assim já conseguimos uniformizar a maneira com que as informações estão sendo exibidas. A partir daqui já podemos até obter algumas estatísticas descritivas, como a média por exemplo.</p>
+<pre class="r"><code>altura &lt;- as.numeric(altura)
+mean(altura)</code></pre>
+<pre><code>## [1] 174.8333</code></pre>
+<p>Note que para obter a média foi preciso transformar o vetor altura, originalmente da classe <code>character</code> em <code>numeric</code>.</p>
 </div>
 <div id="na-prática" class="section level2">
 <h2>Na prática</h2>
 <p>Vamos agora colocar em prática tudo o que vimos em um banco de dados fictício que iremos criar. Supomos que uma empresa nacional de aluguel de veículos esteja interessada em obter algumas informações. Para isso ela irá aplicar um questionário tendo como público as pessoas que já alugaram seus veículos. No questionário as pessoas deveriam passar as seguintes informações: “Marca/modelo do veículo”, “Alugaria de esse veículo novamente?”, “grau de satisfação com a empresa”, “Qual sua cidade/estado (sigla)”. Todas as variáveis do questionario foram do tipo resposta aberta, ou seja, os respondentes poderiam escrevem de qualquer maneira suas respostas. Assim gerou-se uma dificuldade em sumarizar e obter informações relevantes desse banco de dados, já nas respostas foram encontradas erros como, espaços excedentes, palavras iguais escritas de formas diferentes, discordância entre letras maiúsculas e minúsculas, entre outros.<br />
-Torna-se necessário realizar um bom tratamento nesses caractéres para que seja possível extrair todas as informações. Vamos então utilizar o queridinho <code>stringr</code> para nos ajudar</p>
+Torna-se necessário realizar um bom tratamento nesses caracteres para que seja possível extrair todas as informações. Vamos então utilizar o queridinho <code>stringr</code> para nos ajudar.</p>
 <div id="criando-o-banco-de-dados" class="section level4">
 <h4>Criando o banco de dados</h4>
-<p>Existem diferentes formas de criar um banco de dados. Para este exemplo vamos criar 4 vetores e transforma-los em um <code>data.frame</code>.</p>
+<p>Existem diferentes formas de criar um banco de dados. Para este exemplo vamos criar 4 vetores e transformá-los em um <code>data.frame</code>.</p>
 <pre class="r"><code># veículos da locadora: &quot;Honda Civic&quot;, &quot;Toyota Corolla&quot;, &quot;Fiat Argo&quot; e &quot;Ford Fusion&quot;
 veiculo &lt;- c(&quot;Honda  civic&quot;, &quot;honda - civic&quot;, &quot;  fiat Argo&quot;, &quot;FORD FUSION  &quot;, &quot;toyota Corolla&quot;, &quot;Toyota   COROLLA&quot;, &quot;Fiat  / argo&quot;, &quot; HONDA civic&quot;, &quot;ford fusion &quot;, &quot;toyota COROLLa&quot;)
 
@@ -476,8 +475,8 @@ dados &lt;- data.frame(veiculo,
            str_trim() %&gt;% 
            str_to_upper, 
          marca_modelo = paste(marca, modelo))</code></pre>
-<p>Acabamos de criar 3 novas variáveis a partir da variável original (<code>veiculos</code>). Básicamente utilizamos as funções já mostradas ateriormente como a <code>str_trim</code> para remover os espaçoes antes e depois do characteres, também utilizamos o <code>str_remove</code> e <code>str_extrac</code>, ambos combinados com as mesmas expressões regulares (<code>\\s.+|\\s\\(.+|/.+</code>). Em resumo essa regex detecta todo “espaço” seguido por qualquer coisa ou “espaço” seguido por um parenteses aberto seguido por qualquer coisa ou uma “/” seguida por qualquer coisa. Também utilizamos o <code>str_remove(&quot;[:punct:]&quot;)</code> e <code>str_to_upper</code> para deixar todas as letras sem acentos, maiúsculas e padronizadas.</p>
-<p>A variável <code>alugaria_de_novo</code> é do tipo binária que contém, ou pelo menos deveria, dois tipo de respostas: “SIM” e “NÃO”. De fato todas as respostas estão representando ou um SIM ou um NAO, entretando, devido as diferentes maneiras com que elas foram escritas, fica difícil extrair informações. Vamos então tratar essa variável.</p>
+<p>Acabamos de utilizar a função <code>mutate</code> para criar 3 novas variáveis a partir da variável original (<code>veiculos</code>), sendo elas: <code>marca</code>, <code>modelo</code> e <code>marca_modelo</code>. Basicamente utilizamos as funções já mostradas ateriormente como a <code>str_trim</code> para remover os espaçoes antes e depois do characteres, também utilizamos o <code>str_remove</code> e <code>str_extrac</code>, ambos combinados com as mesmas expressões regulares (<code>\\s.+|\\s\\(.+|/.+</code>). Em resumo essa regex detecta todo “espaço” seguido por qualquer coisa ou “espaço” seguido por um parênteses aberto seguido por qualquer coisa ou uma “/” seguida por qualquer coisa. Também utilizamos o <code>str_remove(&quot;[:punct:]&quot;)</code> e <code>str_to_upper</code> para deixar todas as letras sem acentos, maiúsculas e padronizadas.</p>
+<p>A variável <code>alugaria_de_novo</code> é do tipo binária que contém, ou pelo menos deveria, dois tipo de respostas: “SIM” e “NÃO”. De fato todas as respostas estão representando ou um SIM ou um NAO, entretanto, devido as diferentes maneiras com que elas foram escritas, fica difícil extrair informações. Vamos então tratar essa variável.</p>
 <pre class="r"><code>dados$alugaria_de_novo &lt;- dados$alugaria_de_novo %&gt;% 
   str_replace(&quot;^S|s[Ii]&quot;, &quot;SIM&quot;) %&gt;% 
   str_sub(end = 3)
@@ -489,8 +488,8 @@ dados$alugaria_de_novo &lt;- dados$alugaria_de_novo %&gt;%
 
 dados$alugaria_de_novo</code></pre>
 <pre><code>##  [1] &quot;SIM&quot; &quot;SIM&quot; &quot;NAO&quot; &quot;SIM&quot; &quot;NAO&quot; &quot;NAO&quot; &quot;NAO&quot; &quot;SIM&quot; &quot;NAO&quot; &quot;NAO&quot;</code></pre>
-<p>Para este caso usamos o <code>str_replace</code> junto com expressões regulares para substituir palvras que representam “sim” e “não” por“SIM” e o “NAO”, respectivamente. Após isso, usamos o str sub para pegar apenas as três primeiras letras. Vale ressaltar que caso outras palavras apareçam na resposta, ela não vai funcionar, nesse caso será preciso utilizar outras funções ou apenas “aprimorar” as expressões regulares utilizadas.</p>
-<p>Para o grau de satisfação as pessoas deram notas de 0 a 10, notamos que algumas pessoas separaram os números utilizando “.” e outras utilizando “,”. O r entende essa variável como character e pode ser interessante trasnformar essa variável um númerica para realizar algumas análises quantitativas, entretando, temos alguns problemas. O r não irá reconhecer como número uma varavel com duas formas diferentes de separação (“.” e “,”) é necessário padronizar essa variável.</p>
+<p>Para este caso usamos o <code>str_replace</code> junto com expressões regulares para substituir palvras que representam “sim” e “não” por“SIM” e o “NAO”, respectivamente. Após isso, usamos o <code>str_sub</code> para pegar apenas as três primeiras letras. Vale ressaltar que caso outras palavras apareçam na resposta, ela não vai funcionar, nesse caso será preciso utilizar outras funções ou apenas “aprimorar” as expressões regulares utilizadas.</p>
+<p>Para o grau de satisfação as pessoas deram notas de 0 a 10, notamos que algumas pessoas separaram os números utilizando “.” e outras utilizando “,”. O R entende essa variável como character e pode ser interessante trasnformar essa variável em numérica (igual fizemos anteriormente) para realizar algumas análises quantitativas, entretando, temos alguns problemas. O R não irá reconhecer como número uma variável com duas formas diferentes de separação (“.” e “,”), por exemplo, um vetor do tipo <code>c(&quot;3.1&quot;, &quot;3,1&quot;)</code> é necessário padronizar essa variável.</p>
 <pre class="r"><code>dados$grau_de_satisfacao &lt;-  
   str_replace(grau_de_satisfacao, &quot;\\,&quot;, &quot;\\.&quot;) %&gt;% 
   str_trim() 
@@ -500,7 +499,7 @@ dados$grau_de_satisfacao &lt;- round(dados$grau_de_satisfacao, 1)
 
 dados$grau_de_satisfacao</code></pre>
 <pre><code>##  [1]  8.1 10.0  3.2  6.0  5.3  0.0  7.7  9.0  5.0  6.7</code></pre>
-<p>Substituimos todas as virgulas por pontos por meio da função <code>str_replace</code>, depois foi necessário transformar a variável em númerica, fizemos isso por meio da função <code>as.numeric</code>. Logo após, utilizamos a função <code>round</code> para arredondar os números para uma casa decimal. A parte de arredondar números pode ser interessante em diversar análises, o r possui algumas funções além da <code>round</code> como <code>floor</code> e <code>ceiling</code>. Pode ser interessente pesquisar sobre elas.</p>
+<p>Substituímos todas as vírgulas por pontos por meio da função <code>str_replace</code>, depois foi necessário transformar a variável em númerica, fizemos isso por meio da função <code>as.numeric</code>. Logo após, utilizamos a função <code>round</code> para arredondar os números para uma casa decimal. A parte de arredondar números pode ser interessante em diversar análises, o R possui algumas funções além da <code>round</code> como <code>floor</code> e <code>ceiling</code>. Pode ser interessente pesquisar sobre elas.</p>
 <p>A última variável para ser tratada é a que contém as informações de cidade/estado dos respondentes. Observe que as observações tem estruturas parecisar com as da variável <code>veiculos</code>, um tratamento parecido poderia ser útil, mas vamos fazer um pouco diferente.</p>
 <pre class="r"><code>dados$cidade &lt;- dados$cidade %&gt;% 
   str_trim() %&gt;% 
@@ -514,10 +513,12 @@ dados$cidade</code></pre>
 ##  [4] &quot;BELO HORIZONTE MG&quot;   &quot;VITORIA - ES&quot;        &quot;FLORIANOPOLIS - SC&quot; 
 ##  [7] &quot;TRES CORACOES - MG&quot;  &quot;SALVADOR BA&quot;         &quot;SAO PAULO - SP&quot;     
 ## [10] &quot;BELO HORIZONTE - MG&quot;</code></pre>
-<p>Aqui queremos padronizar as observações para que fiquem no padrão “CIDADE - UF” então começamos removendo espaçoes excedentes, depois deixamos todas as letras maiúsculas e então usamos o <code>str_remove_all(&quot;[:punct:]&quot;)</code>, mesmo assim ainda restou restou alguns acentos como em <code>VÍTORIA</code>. Para corrigir isso utilizamos a função <code>rm_accent</code> do pacote <code>abjutils</code>. O último passo seria substituir os espaços que separam a cidade do UF por um “-”. Uma maneira de fazer isso seria utilizando o <code>str_replace</code>, entretanto algumas cidade possuem mais de um nome, ou seja, ao fazer essa substituição todos os espaços seriam afetados e teriamos resultados como “SAO - PAULO - SP”. Uma maneira de contornar isso (nesse caso) é usar as expressões regulares <code>&quot;\\s{2}&quot;</code> que indica “todo espaço seguido por exatamente 2 letras” já que, caso uma cidade tenha mais de um nome, esse segundo nome certamente terá mais de 2 letras e além disso, todos os UF’s tem exatamente duas letras.</p>
-<p>Para finalizar vamos comparar o banco de dados tratado com o original. Uma última coisa a ser feita é reordenar as varíaveis e remover a variável <code>veiculo</code>, já que geramos outras a partir dela deixando-a inutilizavel.</p>
-<pre class="r"><code>dados &lt;- dados %&gt;% 
+<p>Aqui queremos padronizar as observações para que fiquem no padrão “CIDADE - UF” então começamos removendo espaçoes excedentes, depois deixamos todas as letras maiúsculas e então usamos o <code>str_remove_all(&quot;[:punct:]&quot;)</code>, mesmo assim ainda restou restou alguns acentos como em <code>VÍTORIA</code>. Para corrigir isso utilizamos a função <code>rm_accent</code> do pacote <code>abjutils</code>. O último passo seria substituir os espaços que separam a cidade do UF por um “-”. Uma maneira de fazer isso seria utilizando o <code>str_replace</code>, entretanto algumas cidade possuem mais de um nome, ou seja, ao fazer essa substituição todos os espaços seriam afetados e teriamos resultados como “SAO - PAULO - SP”. Uma maneira de contornar isso (nesse caso) é usar as expressões regulares <code>&quot;\\s{2}&quot;</code> que indica “todo espaço seguido por exatamente 2 letras” já que, caso uma cidade tenha mais de um nome, esse segundo nome certamente terá mais de 2 letras e além disso, todos os UF’s tem exatamente duas letras. Em alguns casos pode ser interessante separar em colunas diferentes o município e a cidade. Fizemos algo parecido quando tratamos a primeira variável.</p>
+<p>Para finalizar vamos comparar o banco de dados tratado com o original. Uma última coisa a ser feita é reordenar as varíaveis e remover a variável <code>veiculo</code>, já que geramos outras a partir dela deixando-a inutilizável. Removemos também a variável <code>grau_de_satisfacao</code> para deixar na tabela apenas variáveis qualitativas. Para <code>grau_de_satisfacao</code> vamos apresentar as medidas resumo.</p>
+<pre class="r"><code>grau_de_satisfacao &lt;- dados$grau_de_satisfacao
+dados &lt;- dados %&gt;% 
   subset(select = -c(veiculo)) %&gt;% 
+  subset(select = -c(grau_de_satisfacao)) %&gt;% 
   select(marca_modelo, marca, modelo, everything())
 
 knitr::kable(head(dados, 10))</code></pre>
@@ -528,7 +529,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <th align="left">marca</th>
 <th align="left">modelo</th>
 <th align="left">alugaria_de_novo</th>
-<th align="right">grau_de_satisfacao</th>
 <th align="left">cidade</th>
 </tr>
 </thead>
@@ -538,7 +538,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">HONDA</td>
 <td align="left">CIVIC</td>
 <td align="left">SIM</td>
-<td align="right">8.1</td>
 <td align="left">VITORIA - ES</td>
 </tr>
 <tr class="even">
@@ -546,7 +545,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">HONDA</td>
 <td align="left">CIVIC</td>
 <td align="left">SIM</td>
-<td align="right">10.0</td>
 <td align="left">SAO PAULO - SP</td>
 </tr>
 <tr class="odd">
@@ -554,7 +552,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">FIAT</td>
 <td align="left">ARGO</td>
 <td align="left">NAO</td>
-<td align="right">3.2</td>
 <td align="left">SERRA - ES</td>
 </tr>
 <tr class="even">
@@ -562,7 +559,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">FORD</td>
 <td align="left">FUSION</td>
 <td align="left">SIM</td>
-<td align="right">6.0</td>
 <td align="left">BELO HORIZONTE MG</td>
 </tr>
 <tr class="odd">
@@ -570,7 +566,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">TOYOTA</td>
 <td align="left">COROLLA</td>
 <td align="left">NAO</td>
-<td align="right">5.3</td>
 <td align="left">VITORIA - ES</td>
 </tr>
 <tr class="even">
@@ -578,7 +573,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">TOYOTA</td>
 <td align="left">COROLLA</td>
 <td align="left">NAO</td>
-<td align="right">0.0</td>
 <td align="left">FLORIANOPOLIS - SC</td>
 </tr>
 <tr class="odd">
@@ -586,7 +580,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">FIAT</td>
 <td align="left">ARGO</td>
 <td align="left">NAO</td>
-<td align="right">7.7</td>
 <td align="left">TRES CORACOES - MG</td>
 </tr>
 <tr class="even">
@@ -594,7 +587,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">HONDA</td>
 <td align="left">CIVIC</td>
 <td align="left">SIM</td>
-<td align="right">9.0</td>
 <td align="left">SALVADOR BA</td>
 </tr>
 <tr class="odd">
@@ -602,7 +594,6 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">FORD</td>
 <td align="left">FUSION</td>
 <td align="left">NAO</td>
-<td align="right">5.0</td>
 <td align="left">SAO PAULO - SP</td>
 </tr>
 <tr class="even">
@@ -610,12 +601,14 @@ knitr::kable(head(dados, 10))</code></pre>
 <td align="left">TOYOTA</td>
 <td align="left">COROLLA</td>
 <td align="left">NAO</td>
-<td align="right">6.7</td>
 <td align="left">BELO HORIZONTE - MG</td>
 </tr>
 </tbody>
 </table>
-<p>Com o banco de dados prontos já é possível realizar inumeras análises e conseguir apresentar os resultados/informações. Muitas dessas informações são passadas atráves de gráficos. O pacote <code>ggplot2</code> é um grande aliado nesse ramo, mas isso é assunto para um outros post (spoiler).</p>
+<pre class="r"><code>summary(grau_de_satisfacao)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   0.000   5.075   6.350   6.100   8.000  10.000</code></pre>
+<p>Com o banco de dados prontos já é possível realizar inúmeras análises e conseguir apresentar os resultados/informações. Muitas dessas informações são passadas atráves de gráficos. O pacote <code>ggplot2</code> é um grande aliado nesse ramo, mas isso é assunto para um outros post (spoiler).</p>
 <p>Esperamos que com esse post você possa entender um pouco mais de como tratar strings utilizando (mas não só) o pacote <code>stringr</code> e expressões regulares. Vale ressaltar que realizar um tratamento de caracteres, inumeros obstaculos podem surgir no caminho. É importante ter em mente que cada caso é um caso e muitas das vezes você precisará encontrar uma expressão regular que resolva aquele seu problema específico.</p>
 </div>
 </div>
