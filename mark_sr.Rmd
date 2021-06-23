@@ -273,7 +273,7 @@ alugaria_de_novo <- c("SIM","Sim", "nao", "sim", "não", "NAOOO", "Não",
 grau_de_satisfacao <- c("8.1", "10", "3,23", "6", " 5,3", "0,0000", 
                         "7.7", "9 ", "5", "6,666")
 
-cidade <- c("Vitória - ES", "sao paulo - sp", "serra - es ", 
+cidade <- c("Vitória - ES", "sao paulo - sp", "Rio de Janeiro /Rj", 
             "BELO HORIZONTE MG", " vitoria  Es", "Florianopolis / sc ", 
             "TRES CORAÇÕES - mg", "salvador BA", "São Paulo - SP", 
             " belo horizonte / mg")
@@ -311,11 +311,13 @@ dados <- dados %>%
            str_to_upper, 
          marca_modelo = paste(marca, modelo))
 
+dados <- dados %>% 
+  subset(select = -c(veiculo))
 ```
 
 
 Acabamos de utilizar a função `mutate` para criar 3 novas variáveis a partir da variável original (`veiculos`), sendo elas: `marca`, `modelo` e `marca_modelo`. 
-Basicamente utilizamos as funções já mostradas ateriormente como a `str_trim` para remover os espaços antes e depois do characteres, também utilizamos o `str_remove` e `str_extract`, ambos combinados com as mesmas expressões regulares (`\\s.+|\\s\\(.+|/.+`). Em resumo essa regex detecta todo "espaço" seguido por qualquer coisa ou "espaço" seguido por um parênteses aberto seguido por qualquer coisa ou uma "/" seguida por qualquer coisa. Também utilizamos o `str_remove("[:punct:]")` e `str_to_upper` para deixar todas as letras sem acentos, maiúsculas e padronizadas.
+Basicamente utilizamos as funções já mostradas ateriormente como a `str_trim` para remover os espaços antes e depois do characteres, também utilizamos o `str_remove` e `str_extract`, ambos combinados com as mesmas expressões regulares (`\\s.+|\\s\\(.+|/.+`). Em resumo essa regex detecta todo "espaço" seguido por qualquer coisa ou "espaço" seguido por um parênteses aberto seguido por qualquer coisa ou uma "/" seguida por qualquer coisa. Também utilizamos o `str_remove("[:punct:]")` e `str_to_upper` para deixar todas as letras sem acentos, maiúsculas e padronizadas. Retiramos do banco de dados a variável original `veiculos` já que se tornou inutilizável.
 
 A variável `alugaria_de_novo` é do tipo binária que contém, ou pelo menos deveria, dois tipo de respostas: "SIM" e "NÃO". De fato todas as respostas estão representando ou um SIM ou um NAO, entretanto, devido as diferentes maneiras com que elas foram escritas, fica difícil extrair informações. Vamos então tratar essa variável.
 
@@ -356,26 +358,60 @@ dados$cidade <- dados$cidade %>%
   str_to_upper() %>% 
   str_remove_all("[:punct:]") %>% 
   abjutils::rm_accent() %>% 
-  str_replace("\\s{2}" , " - ")
+  str_replace("\\s(?=([:alpha:]){2}$)" , " - ") %>% 
+  str_replace_all("\\s{2,}", " ")
 
 dados$cidade
 ```
 
 
-Aqui queremos padronizar as observações para que fiquem no padrão "CIDADE - UF" então começamos removendo espaços excedentes, depois deixamos todas as letras maiúsculas e então usamos o `str_remove_all("[:punct:]")`, mesmo assim ainda restou restou alguns acentos como em `VÍTORIA`. Para corrigir isso utilizamos a função `rm_accent` do pacote `abjutils`. O último passo seria substituir os espaços que separam a cidade do UF por um "-". Uma maneira de fazer isso seria utilizando o `str_replace`, entretanto algumas cidade possuem mais de um nome, ou seja, ao fazer essa substituição todos os espaços seriam afetados e teriamos resultados como "SAO - PAULO - SP". Uma maneira de contornar isso (nesse caso) é usar as expressões regulares `"\\s{2}"` que indica "todo espaço seguido por exatamente 2 letras" já que, caso uma cidade tenha mais de um nome, esse segundo nome certamente terá mais de 2 letras e além disso, todos os UF's tem exatamente duas letras. Em alguns casos pode ser interessante separar em colunas diferentes o município e a cidade. Fizemos algo parecido quando tratamos a primeira variável.
+Aqui queremos padronizar as observações para que fiquem no padrão "CIDADE - UF" então começamos removendo espaços excedentes, depois deixamos todas as letras maiúsculas e então usamos o `str_remove_all("[:punct:]")`, mesmo assim ainda restou restou alguns acentos como em `VÍTORIA`. Para corrigir isso utilizamos a função `rm_accent` do pacote `abjutils`. O último passo seria substituir os espaços que separam a cidade do UF por um "-". Uma maneira de fazer isso seria utilizando o `str_replace`, entretanto algumas cidade possuem mais de um nome, ou seja, ao fazer essa substituição todos os espaços seriam afetados e teriamos resultados como "SAO - PAULO - SP". Uma maneira de contornar isso (nesse caso) é usar as expressões regulares `"\\s(?=([:alpha:]){2}$)"` basicamente está pegando, no final da string, todo espaço seguido por exatamente 2 letras quaisquer `"([:alpha:])"`. O `?=` faz com que seja alterada apenas a entrada, nesse caso ele vai alterar apenas o espaço. Consideramos que todos os UF's tem exatamente duas letras. Em alguns casos pode ser interessante separar em colunas diferentes o município e a cidade. Fizemos algo parecido quando tratamos a primeira variável.
 
-Para finalizar vamos comparar o banco de dados tratado com o original. Uma última coisa a ser feita é reordenar as varíaveis e remover  a variável `veiculo`, já que geramos outras a partir dela deixando-a inutilizável. Removemos também a variável `grau_de_satisfacao` para deixar na tabela apenas variáveis qualitativas. Para `grau_de_satisfacao` vamos apresentar as medidas resumo.
+Vamos dar uma olhada em como ficou o nosso banco de dados final 
 
 ```{r}
-grau_de_satisfacao <- dados$grau_de_satisfacao
 dados <- dados %>% 
-  subset(select = -c(veiculo)) %>% 
-  subset(select = -c(grau_de_satisfacao)) %>% 
-  select(marca_modelo, marca, modelo, everything())
-
+  select(marca_modelo, marca, modelo, alugaria_de_novo, cidade, grau_de_satisfacao)
+  
 knitr::kable(dados)
 
-summary(grau_de_satisfacao)
+```
+
+
+Para finalizar é interessente ver que nosso tratamento de dados funcionou. Queremos saber se nossas observações estão corretamentes estruturadas, se por exemplo todas as respostas que representam a mesma coisa estão de fato iguais. Uma maneira legal de fazer isso é criar tabelas de frequência para as variáveis qualitativas e apresentar medidas resumo para as variáveis quantitativas.
+
+```{r}
+questionr::freq(
+  dados$marca_modelo,
+  cum = FALSE,
+  total = TRUE,
+  na.last = FALSE,
+  valid = FALSE,
+  sort = "inc"
+) %>%
+  knitr::kable(caption = "Tabela de frequências para marca/modelo", digits = 2) 
+
+questionr::freq(
+  dados$cidade,
+  cum = FALSE,
+  total = TRUE,
+  na.last = FALSE,
+  valid = FALSE,
+  sort = "inc"
+) %>%
+  knitr::kable(caption = "Tabela de frequências para cidade/estado", digits = 2) 
+
+questionr::freq(
+  dados$alugaria_de_novo,
+  cum = FALSE,
+  total = TRUE,
+  na.last = FALSE,
+  valid = FALSE,
+  sort = "inc"
+) %>%
+  knitr::kable(caption = "Tabela de frequências para 'alugaria de novo'", digits = 2)
+
+summary(dados$grau_de_satisfacao)
 ```
 
 
