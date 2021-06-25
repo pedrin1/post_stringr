@@ -334,7 +334,7 @@ dados$alugaria_de_novo <- dados$alugaria_de_novo %>%
 dados$alugaria_de_novo
 ```
 
-Para este caso usamos o `str_replace` junto com expressões regulares para substituir palavras que representam  "sim" e "não" por "SIM" e o "NAO", respectivamente. As regex usadas para esse caso foram `"^S|s[Ii]"`, que representa "todo S ou s seguido por I ou i obersado no início da string" e `^N|n[Aaãâ]` que representa "todo n ou N seguido por A, a, ã ou â".
+Para este caso usamos o `str_replace` junto com expressões regulares para substituir palavras que representam  "sim" e "não" por "SIM" e o "NAO", respectivamente. As regex usadas para esse caso foram `"^S|s[Ii]"`, que representa "todo S ou s seguido por I ou i observado no início da string" e `^N|n[Aaãâ]` que representa "todo n ou N seguido por A, a, ã ou â".
 Após isso, usamos o `str_sub` para pegar apenas as três primeiras letras. Vale ressaltar que caso outras palavras apareçam na resposta, ela não vai funcionar, nesse caso será preciso utilizar outras funções ou apenas "aprimorar" as expressões regulares utilizadas.
 
 Para o grau de satisfação as pessoas deram notas de 0 a 10. Notamos que algumas pessoas separaram os números utilizando "." e outras utilizando ",". O R entende essa variável como `character` e pode ser interessante transformar essa variável em numérica (igual fizemos anteriormente) para realizar algumas análises quantitativas. O R não irá reconhecer como número uma variável com duas formas diferentes de separação para o dígito (“.” e “,”), por exemplo, para um vetor do tipo `c("3.1", "3,1")` é necessário padronizar essa variável utilizando o mesmo separador.
