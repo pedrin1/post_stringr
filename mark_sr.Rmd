@@ -20,7 +20,7 @@ Algumas tarefas relacionadas a string's podem ser listadas, como:
 
 Vamos primeiro mostrar algumas funções básicas do pacote que podem nos auxiliar nessa manipulação de caracteres e depois falaremos sobre as expressões regulares. Com um breve conhecimento em ambas as partes (funções e Regex), podemos juntá-las e com isso tornar nossas análises muito mais fáceis.
 
-Para usar o pacote podemos importá-lo diretamente ou através do tidyverse. Para o post vamos carregar o tidyverse pois iremos utilizar algumas funções de outros pacotes. Vale lembrar que já fizemos um post sobre o  `tidyverse` e pode acessá-lo clicando [aqui](https://daslab-ufes.github.io/tidyverse/).
+Para usar o pacote podemos importá-lo diretamente ou através do tidyverse. Para o post vamos carregar o tidyverse pois iremos utilizar algumas funções de outros pacotes. Vale lembrar que já fizemos um post sobre o  `tidyverse` e você pode acessá-lo clicando [aqui](https://daslab-ufes.github.io/tidyverse/).
 
 <!-- que em resumo são letras, símbolos, sinais, número que representa algo escrito, etc.. Esses -->
 
@@ -32,7 +32,7 @@ library(tidyverse)
 
 ### `str_length`
 
-A primeira função que vamos falar é a `str_length`. Uma função bem simples do `stringr` que tem como objetivo fornecer o número de caracteres de uma string, ou seja, o comprimento da string (não confunda com o `length()` de um vetor). Uma observação é que para valores `NA` ela irá retornar `NA`, ao invés de contar o número de caracteres na string `NA`. Vamos a um exemplo
+A primeira função que vamos falar é a `str_length`. Essa é uma função bem simples do `stringr` que tem como objetivo fornecer o número de caracteres de uma string, ou seja, o comprimento da string (não confunda com o `length()` de um vetor). Uma observação é que para valores `NA` ela irá retornar `NA`, ao invés de contar o número de caracteres na string `NA`. Vamos a um exemplo
 
 ```{r}
 ex_1 <- c("tamanho", "das", "palavras", "com", "str_length", NA, "3")
@@ -43,7 +43,7 @@ str_length(ex_1)
 
 ### `str_sub`
 
-É comum você precisar pegar partes fixas de strings, como apenas a parte final das strings ou apenas os 2 primeiros caracteres. Essa função possui 5 argumentos, você pode ver de uma forma mais clara utilizando o help do R (rodar `?str_sub` no console). Os três primeiros argumentos são em geral os mais utilizados. O primeiro irá receber um vetor de caracteres, o objeto no qual a função irá fazer as buscas. O segundo `start` você indica onde irá começar e o argumento `end` indica até onde ir na busca. Para este exemplo em particular vamos criar uma vetor mais organizado para ficar mais claro.
+É comum você precisar pegar partes fixas de strings, como apenas a parte final das strings ou apenas os 2 primeiros caracteres. Essa função possui 5 argumentos, os quais podem ser obtidos utilizando o help do R (rodar `?str_sub` no console). Os três primeiros argumentos são em geral os mais utilizados. O primeiro irá receber um vetor de caracteres, o objeto no qual a função irá fazer as buscas. O segundo `start` você indica onde irá começar e o argumento `end` indica até onde ir na busca. Para este exemplo em particular vamos criar uma vetor mais organizado para ficar mais claro.
 
 ```{r}
 # vamos criar um vetor de caracteres padronizando "nome-idade"
@@ -51,14 +51,14 @@ ex_sub <- c("João-42", "Maria-29", "Pedro-20", "Tereza-50")
 
 ```
 
-Primeiro vamos supor que a gente queira pegar apenas os nomes. Como nesse caso os caracteres possuem tamanhos diferentes para os nomes, mas a idade possui dois digitos para todos. Uma característica interessante do `str_sub()` é sua capacidade de trabalhar com índices negativos nas posições start e end. Quando usamos uma posição negativa, str_sub() conta regressivamente a partir do último caractere:
+Primeiro vamos supor que a gente queira pegar apenas os nomes. Como nesse caso os caracteres possuem tamanhos diferentes para os nomes, mas a idade possui dois dígitos para todos. Uma característica interessante do `str_sub()` é sua capacidade de trabalhar com índices negativos nas posições start e end. Quando usamos uma posição negativa, str_sub() conta regressivamente a partir do último caracter:
 
 
 ```{r}
 str_sub(ex_sub, end  = -4)
 ```
 
-Caso a gente queira pegar apenas as idade podemos utilizar o argumento start para indicar onde iremos começar.
+Caso a gente queira pegar apenas as idade podemos utilizar o argumento `start` para indicar onde iremos começar.
 
 ```{r}
 # neste caso iremos pegar do penultimo caractere até o último
@@ -112,7 +112,7 @@ altura %>% str_detect("8")
 altura %>% str_detect("cm|centimetro")
 ```
  
-Note que na segunda vez que utilizamos função, escrevemos "centimetro" e o vetor retornou um `TRUE` na posição dois, entretando ela está no plural (centimetros). É exatamento isso que a função faz, ela não está buscando toda a palavra, ela busca padrões, qualquer caracter que tiver, nesse caso, "centimetro" ele irá retornar o valor `TRUE`. Neste mesmo conceito, existe a função `str_which` que no lugar de retornar um vetor booleano, ela retorna as posições no vetor em que a string buscada foi encontrada.
+Note que na segunda vez que utilizamos função, escrevemos "centimetro" e o vetor retornou um `TRUE` na posição dois, entretando ela está no plural (centimetros). É exatamento isso que a função faz: ela não está buscando toda a palavra, ela busca padrões, qualquer string que tiver, nesse caso, "centimetro" ele irá retornar o valor `TRUE`. Neste mesmo conceito, existe a função `str_which` que no lugar de retornar um vetor booleano, ela retorna as posições no vetor em que a string buscada foi encontrada.
 
 ```{r}
 altura %>% str_which("cm|centimetro")
@@ -152,7 +152,7 @@ str_replace_all(altura, c("cm" = "cm1", "centimetros" = "cm2", "metros" = ""))
 
 # Expressões regulares
 
-Agora que já conhecemos algumas das funções do pacote stringr, vamos falar um pouco sobre as expressões regulares (regex). Para trabalhar com textos de uma maneira fácil, é necessário saber um pouco de regex.  Elas permitem identificar conjuntos de caracteres, palavras e outros padrões por meio de uma sintaxe concisa. O pacote divide algumas "características" das expressões regulares em subgrupos, como são muitos e normalmente seguem um padrão vamos falar apenas de algumas. Você pode ter acesso a toda parte de regex através do [cheat sheet](https://github.com/rstudio/cheatsheets/blob/master/strings.pdf). Para facilitar o entendimento, após introduzir uma base das expressões regulares, vamos seguir com os exemplos práticos, exemplicando passo a passo o que está acontecendo.
+Agora que já conhecemos algumas das funções do pacote `stringr`, vamos falar um pouco sobre as expressões regulares (regex). Para trabalhar com textos de uma maneira fácil, é necessário saber um pouco de regex.  Elas permitem identificar conjuntos de caracteres, palavras e outros padrões por meio de uma sintaxe concisa. O pacote divide algumas "características" das expressões regulares em subgrupos, como são muitos e normalmente seguem um padrão vamos falar apenas de algumas. Você pode ter acesso a toda parte de regex através do seguinte [cheat sheet](https://github.com/rstudio/cheatsheets/blob/master/strings.pdf). Para facilitar o entendimento, após introduzir uma base das expressões regulares, vamos seguir com os exemplos práticos, exemplicando passo a passo o que está acontecendo.
 
 ## Classes
 
@@ -224,7 +224,7 @@ carros2
 identical(carros1, carros2)
 ```
 
-Como já vimos, a função `str_replace_all` nos ajuda a fazer substiuições de caracteres. Nesse caso, a regex `\\s` significa "espaço". O "{2,}", como já vimos, indica que queremos identificar algo se repita duas ou mais vezes. Então a função basicamente irá identificar toda vez que um espaço aparecer seguidamente duas ou mais vezes e vai substituir por apenas um espaço. Note que agora o identical retorna `true`, ou seja, os vetores são iguais. Lembrando que já falamos da `str_trim()` que remove espaços no começo e no fim dos caracteres, agora sabemos como tratar qualquer tipo de problema relacionado a espaços excedentes.
+Como já vimos, a função `str_replace_all` nos ajuda a fazer substiuições de caracteres. Nesse caso, a regex `\\s` significa "espaço". O `{2,}` indica que queremos identificar algo se repita duas ou mais vezes. Então a função basicamente irá identificar toda vez que um espaço aparecer seguidamente duas ou mais vezes e vai substituir por apenas um espaço. Note que agora o identical retorna `true`, ou seja, os vetores são iguais. Lembrando que já falamos da `str_trim()` que remove espaços no começo e no fim dos caracteres, agora sabemos como tratar qualquer tipo de problema relacionado a espaços excedentes.
 
 Vamos agora voltar para um vetor que já utilizamos acima. Devido a maneira com que os caracteres estão armazenadas nesse vetor, fica complicado transformar esses caracteres em informações. Ao utilizarmos expressões regulares de uma forma bem simples, já conseguimos trabalhar com essas informaçõs. 
 
@@ -317,9 +317,9 @@ dados <- dados %>%
 
 
 Acabamos de utilizar a função `mutate` para criar 3 novas variáveis a partir da variável original (`veiculos`), sendo elas: `marca`, `modelo` e `marca_modelo`. 
-Basicamente utilizamos as funções já mostradas ateriormente como a `str_trim` para remover os espaços antes e depois do characteres, também utilizamos o `str_remove` e `str_extract`, ambos combinados com as mesmas expressões regulares (`\\s.+|\\s\\(.+|/.+`). Em resumo essa regex detecta todo "espaço" seguido por qualquer coisa ou "espaço" seguido por um parênteses aberto seguido por qualquer coisa ou uma "/" seguida por qualquer coisa. Também utilizamos o `str_remove("[:punct:]")` e `str_to_upper` para deixar todas as letras sem acentos, maiúsculas e padronizadas. Retiramos do banco de dados a variável original `veiculos` já que se tornou inutilizável.
+Basicamente utilizamos as funções já mostradas ateriormente como a `str_trim` para remover os espaços antes e depois do characteres, também utilizamos o `str_remove` e `str_extract`, ambos combinados com as mesmas expressões regulares (`\\s.+|\\s\\(.+|/.+`). Em resumo essa regex detecta todo "espaço" seguido por qualquer coisa **ou** "espaço" seguido por um parênteses aberto seguido por qualquer coisa **ou** uma "/" seguida por qualquer coisa. Também utilizamos o `str_remove("[:punct:]")` e `str_to_upper` para deixar todas as letras sem acentos, maiúsculas e padronizadas. Retiramos do banco de dados a variável original `veiculos` já que se tornou inutilizável.
 
-A variável `alugaria_de_novo` é do tipo binária que contém, ou pelo menos deveria, dois tipo de respostas: "SIM" e "NÃO". De fato todas as respostas estão representando ou um SIM ou um NAO, entretanto, devido as diferentes maneiras com que elas foram escritas, fica difícil extrair informações. Vamos então tratar essa variável.
+A variável `alugaria_de_novo` é do tipo binária que contém, ou pelo menos deveria conter, dois tipo de respostas: "SIM" e "NÃO". De fato todas as respostas estão representando SIM ou NAO, entretanto, devido às diferentes maneiras com que elas foram escritas, fica difícil extrair informações. Vamos então tratar essa variável.
 
 
 ```{r}
@@ -348,7 +348,7 @@ dados$grau_de_satisfacao <-
 dados$grau_de_satisfacao
 ```
 
-Substituímos todas as vírgulas por pontos por meio da função `str_replace`, depois foi necessário transformar a variável em númerica, fizemos isso por meio da função `as.numeric`. Logo após, utilizamos a função `round` para arredondar os números para uma casa decimal. A parte de arredondar números pode ser interessante em diversar análises e o R possui algumas funções além da `round` como `floor` e `ceiling`. Pode ser interessente pesquisar sobre elas. 
+Substituímos todas as vírgulas por pontos por meio da função `str_replace`, depois foi necessário transformar a variável em númerica, fizemos isso por meio da função `as.numeric`. Logo após, utilizamos a função `round` para arredondar os números para uma casa decimal. A parte de arredondar números pode ser interessante em diversar análises e o R possui algumas funções como `floor` e `ceiling`, além da `round`. Logo, quando estiver trabalhando com arrendondamentos pode ser interessente pesquisar sobre elas. 
 
 A última variável para ser tratada é a que contém as informações de cidade/estado dos respondentes. Observe que as observações tem estruturas parecidas com as da variável `veiculos`, logo um tratamento similar poderia ser útil, mas vamos fazer um pouco diferente.
 
@@ -365,7 +365,7 @@ dados$cidade
 ```
 
 
-Aqui queremos padronizar as observações para que fiquem no padrão "CIDADE - UF" então começamos removendo espaços excedentes, depois deixamos todas as letras maiúsculas e então usamos o `str_remove_all("[:punct:]")`, mesmo assim ainda restou restou alguns acentos como em `VÍTORIA`. Para corrigir isso utilizamos a função `rm_accent` do pacote `abjutils`. O último passo seria substituir os espaços que separam a cidade do UF por um "-". Uma maneira de fazer isso seria utilizando o `str_replace`, entretanto algumas cidade possuem mais de um nome, ou seja, ao fazer essa substituição todos os espaços seriam afetados e teriamos resultados como "SAO - PAULO - SP". Uma maneira de contornar isso (nesse caso) é usar as expressões regulares `"\\s(?=([:alpha:]){2}$)"` basicamente está pegando, no final da string, todo espaço seguido por exatamente 2 letras quaisquer `"([:alpha:])"`. O `?=` faz com que seja alterada apenas a entrada, nesse caso ele vai alterar apenas o espaço. Consideramos que todos os UF's tem exatamente duas letras. Em alguns casos pode ser interessante separar em colunas diferentes o município e a cidade. Fizemos algo parecido quando tratamos a primeira variável.
+Aqui queremos padronizar as observações para que fiquem no padrão "CIDADE - UF" então começamos removendo espaços excedentes, depois deixamos todas as letras maiúsculas e então usamos o `str_remove_all("[:punct:]")`, mesmo assim ainda restou restou alguns acentos como em `VITÓRIA`. Para corrigir isso utilizamos a função `rm_accent` do pacote `abjutils`. O último passo seria substituir os espaços que separam a cidade do UF por um "-". Uma maneira de fazer isso seria utilizando o `str_replace`, entretanto algumas cidade possuem mais de um nome, ou seja, ao fazer essa substituição todos os espaços seriam afetados e teriamos resultados como "SAO - PAULO - SP". Uma maneira de contornar isso (nesse caso) é usar a expressão regular `"\\s(?=([:alpha:]){2}$)"`. Essa expressão basicamente está pegando, no final da string, todo espaço seguido por exatamente 2 letras quaisquer `"([:alpha:])"`. O `?=` faz com que seja alterada apenas a entrada, nesse caso ele vai alterar apenas o espaço. Consideramos que todos os UF's tem exatamente duas letras. Em alguns casos pode ser interessante separar em colunas diferentes o município e a cidade. Fizemos algo parecido quando tratamos a primeira variável.
 
 Vamos dar uma olhada em como ficou o nosso banco de dados final 
 
@@ -374,9 +374,7 @@ dados <- dados %>%
   select(marca_modelo, marca, modelo, alugaria_de_novo, cidade, grau_de_satisfacao)
   
 knitr::kable(dados)
-
 ```
-
 
 Para finalizar é interessente ver que nosso tratamento de dados funcionou. Queremos saber se nossas observações estão corretamentes estruturadas, se por exemplo todas as respostas que representam a mesma coisa estão de fato iguais. Uma maneira legal de fazer isso é criar tabelas de frequência para as variáveis qualitativas e apresentar medidas resumo para as variáveis quantitativas.
 
